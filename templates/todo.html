@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container{
+            width:70%;
+            display:inline-block;
+            justify-content:space-around;
+            align-items:center;
+        }
+        #forms{
+            display:flex;
+            width:70%;
+        }
+        #forms input{
+            flex:1
+        }
+        #forms input[type="submit"]{
+           flex-shrink :2;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <form action="" id="forms">
+            <label>Title:</label>  <input type="text" id="title">
+             <label>Description:</label> <input type="text" id="description">
+              <input type="submit" value="Submit" style="flex-shrink :2;">
+          </form>
+    </div>
+    
+    <div id="container">
+
+
+
+    </div>
+    <script>
+        list()
+        function list(){
+            var con = document.getElementById("container");
+            var url='http://127.0.0.1:8000/api/todolist'
+            fetch(url)
+            .then((resp)=> resp.json())
+            .then(function(data){
+                console.log(data)
+                var list = data
+                for(var i in list) 
+                {
+                   var item= `
+                   <div style= width:100%;display:flex;>
+                        <div style=flex:1; >${list[i].title}</div>
+                        
+                        <div style=flex:1;>${list[i].description}</div>
+                        <div><button id="edit-${i}" style=background-color:skyblue;>Edit</button></div>
+                        <div><button id="delete-${i}" style=background-color:red;>Delete</button></div>
+                    </div>             
+                   `
+                   con.innerHTML+=item  
+                }
+                   
+                        })
+                   
+        };
+    </script>
+</body>
+</html>
