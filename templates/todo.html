@@ -1,56 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-        #container{
-            width:70%;
-            display:inline-block;
-            justify-content:space-around;
-            align-items:center;
-        }
-        #forms{
-            display:flex;
-            width:70%;
-        }
-        #forms input{
-            flex:1
-        }
-        #forms input[type="submit"]{
-           flex-shrink :2;
-        }
+      #container {
+        margin-top: 3%;
+        width: 70%;
+        display: inline-block;
+        justify-content: space-around;
+        align-items: center;
+      }
+      #forms {
+        display: flex;
+        width: 70%;
+      }
+      #forms input {
+        flex: 1;
+      }
+      #forms input[type="submit"] {
+        flex-shrink: 2;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div>
-        <form action="" id="forms">
-            <label>Title:</label>  <input type="text" id="title">
-             <label>Description:</label> <input type="text" id="description">
-              <input type="submit" value="Submit" style="flex-shrink :2;">
-          </form>
+      <form action="" id="forms">
+        <label>Title:</label> <input type="text" id="title" />
+        <label>Description:</label> <input type="text" id="description" />
+        <input type="submit" value="Submit" />
+      </form>
     </div>
-    
-    <div id="container">
 
-
-
-    </div>
+    <div id="container"></div>
     <script>
-        list()
-        function list(){
-            var con = document.getElementById("container");
-            var url='http://127.0.0.1:8000/api/todolist'
-            fetch(url)
-            .then((resp)=> resp.json())
-            .then(function(data){
-                console.log(data)
-                var list = data
-                for(var i in list) 
-                {
-                   var item= `
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      const csrftoken = getCookie("csrftoken");
+      list();
+      function list() {
+        var con = document.getElementById("container");
+        con.innerHTML =""
+        var url = "http://127.0.0.1:8000/api/todolist";
+        fetch(url)
+          .then((resp) => resp.json())
+          .then(function (data) {
+            console.log(data);
+            var list = data;
+            for (var i in list) {
+              var item = `
                    <div style= width:100%;display:flex;>
                         <div style=flex:1; >${list[i].title}</div>
                         
@@ -58,13 +73,32 @@
                         <div><button id="edit-${i}" style=background-color:skyblue;>Edit</button></div>
                         <div><button id="delete-${i}" style=background-color:red;>Delete</button></div>
                     </div>             
-                   `
-                   con.innerHTML+=item  
-                }
-                   
-                        })
-                   
-        };
+                   `;
+              con.innerHTML += item;
+            }
+          });
+      }
+      var form = document.getElementById("forms");
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        console.log("working");
+        var url = "http://127.0.0.1:8000/api/create";
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+            "X-CSRFToken":csrftoken
+          },
+          body: JSON.stringify({
+            "title": form.title.value,
+            "description": form.description.value,
+          }),
+        })
+        .then(function(response) {
+          list()
+        })
+      });
     </script>
-</body>
+  </body>
 </html>
